@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="components/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="components/jquery-ui/jquery-ui.min.css" rel="stylesheet">
+    <link href="styles/main.css" rel="stylesheet">
+
+    <title>SmartTest Home Page</title>
+</head>
+
+<body ng-app='smarttestApp' ng-controller='MainController'>
+    <div class="loader" id="loading"></div>
+    <div class="container-fluid">
+        <header class="row">
+            <div class="col-md-4 col-xs-6">
+                <div class="appname">SmartTest</div>
+                <div class="welcome">
+                    Welcome, <span class="username" ng-bind='userName'>Username<span class="caret"></span> </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-md-offset-4 col-xs-6 logo-container">
+                <img src="images/logo.png" alt="John Deere Logo" class="logo" />
+            </div>
+        </header>
+
+        <div class="row">
+            <img alt="color Bar" src="images/colorbar_gy_web.jpg" width="100%" height="13px">
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12 bodypart" id="viewbody">
+                <div>
+                    <div class="col-md-4 leftalign">
+                        <h4>Workstations</h4>
+                    </div>
+                    <div class="col-md-4"><input type="text" class="form-control" ng-model="newWorkstationNo" required></input></div>
+                        <div class="col-md-4 rightalign">
+                            <!-- Trigger the modal with a button -->
+                            <button type="button" class="btn btn-primary" ng-if="newWorkstationNo.length > 0" ng-click="openModalForNewEntry()" data-toggle="modal" data-target="#myModal">Create New</button>
+                            <button type="button" class="btn btn-default" ng-if="newWorkstationNo==undefined||newWorkstationNo.length <= 0">Create New</button>
+
+                        </div>
+                    <div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-condensed table-hover">
+                                <thead>
+                                    <tr>
+                                        <!--<th>Unit Code</th>-->
+                                        <th class="col-xs-3">Workstation</th>
+                                        <th class="col-xs-3">Name</th>
+                                        <th class="col-xs-3">Status</th>
+                                        <th class="col-xs-3">Station Version</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="plantStation in plantStations">
+                                        <!--<td ng-bind="plantStation.unitCode"></td>-->
+                                        <td><a ng-click="openModalToUpdate(plantStation.id)">{{plantStation.stationNumber}}</a></td>
+                                        <td ng-bind="plantStation.stationName"></td>
+                                        <td ng-bind="plantStation.status"></td>
+                                        <td ng-bind="plantStation.stationVersion"></td>
+                                        <td>
+                                            <button class="btn btn-danger" ng-click="deleteWorkStationInfo(plantStation.id)" title="Delete">
+                                                <span class="glyphicon glyphicon-trash"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-dialog modal-lg">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h2 class="modal-title">Workstations Details - {{newWorkstationNo}}</h2>
+                </div>
+                <div class="modal-body">
+                    
+                    <label for="configuration" class="col-sm-3 control-label">Configurations</label>
+                    <div class="col-sm-5">
+                        <select class="form-control" ng-model="selectBox">
+                            <option ng-repeat="x in configurations" value="{{x}}">{{x}}</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12" style="overflow-x:auto;">
+                            <table ng-if="selectBox === 'Plant Station Details'" class="table table-bordered table-striped table-condensed" style="width: 100%; height: 100%;" border="1" cellpadding="1">
+                                <thead>
+                                    <tr>
+                                        <th class="col-xs-3">Station Name</th>
+                                        <th class="col-xs-3">Status</th>
+                                        <th class="col-xs-3">Station Version</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="text" class="form-control" placeholder="Station Name" ng-model="plantstation.stationName" required></td>
+                                        <td><input type="text" class="form-control" placeholder="Status" ng-model="plantstation.status" required></td>
+                                        <td><input type="text" class="form-control" placeholder="Station Version" ng-model="plantstation.stationVersion" required></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table ng-if="selectBox === 'Can Hardware'" class="table table-bordered table-striped table-condensed" style="width: 100%; height: 100%;" border="1" cellpadding="1">
+                                <thead>
+                                    <tr>
+                                        <th class="col-xs-2">Channel Name</th>
+                                        <th class="col-xs-2">CAN Device</th>
+                                        <th class="col-xs-2">HW Index</th>
+                                        <th class="col-xs-2">Channel Index</th>
+                                        <th class="col-xs-2">HW Type</th>
+                                        <th class="col-xs-2">Alias Name</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="ch in canhardware" name="chForm"  ng-form >
+                                        <td><input type="text" class="form-control" placeholder="Channel Name" ng-model="ch.channelName" required></td>
+                                        <td><input type="text" class="form-control" placeholder="CAN Device" ng-model="ch.canDevice" required></td>
+                                        <td><input type="text" class="form-control" placeholder="HW Index" ng-model="ch.hardwareIndex" required></td>
+                                        <td><input type="text" class="form-control" placeholder="Channel Index" ng-model="ch.channelIndex" required></td>
+                                        <td><input type="text" class="form-control" placeholder="HW Type" ng-model="ch.hardwareType" required></td>
+                                        <td><input type="text" class="form-control" placeholder="Alias Name" ng-model="ch.aliasName" required></td>
+                                        <td><button class="btn btn-danger" ng-click="deleteRow('Can Hardware', ch)" value="Remove">
+                                                <span class="glyphicon glyphicon-trash"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table ng-if="selectBox === 'Config Setting'" class="table table-bordered table-striped table-condensed" style="width: 100%; height: 100%;" border="1" cellpadding="1">
+                                <thead>
+                                    <tr>
+                                        <th class="col-xs-4">Key</th>
+                                        <th class="col-xs-4">Value 1</th>
+                                        <th class="col-xs-4">Value 2</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="cs in configsetting">
+                                        <td><input type="text" class="form-control" placeholder="Key" ng-model="cs.key"></td>
+                                        <td><input type="text" class="form-control" placeholder="Value 1" ng-model="cs.value"></td>
+                                        <td><input type="text" class="form-control" placeholder="Value 2" ng-model="cs.value2"></td>
+                                        <td><button class="btn btn-danger" ng-click="deleteRow('Config Setting', cs)" value="Remove">
+                                                <span class="glyphicon glyphicon-trash"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table ng-if="selectBox === 'JDTester HW'" class="table table-bordered table-striped table-condensed" style="width: 100%; height: 100%;" border="1" cellpadding="1">
+                                <thead>
+                                    <tr>
+                                        <th style="min-width: 100px;">Name</th>
+                                        <th style="min-width: 100px;">Description</th>
+                                        <th style="min-width: 100px;">TLA</th>
+                                        <th style="min-width: 100px;">Felx Box Pin</th>
+                                        <th style="min-width: 100px;">Type Code</th>
+                                        <th style="min-width: 100px;">Bulk Head Pin</th>
+                                        <th style="min-width: 100px;">Pull Up</th>
+                                        <th style="min-width: 100px;">PWM</th>
+                                        <th style="min-width: 100px;">Connector</th>
+                                        <th style="min-width: 100px;">Fuses Relays</th>
+                                        <th style="min-width: 100px;">Block Offset</th>
+                                        <th style="min-width: 100px;">Bit Offset</th>
+                                        <th style="min-width: 100px;">Raw Minimum</th>
+                                        <th style="min-width: 100px;">Raw Maximum</th>
+                                        <th style="min-width: 100px;">Scaling Factor</th>
+                                        <th style="min-width: 100px;">Scaling Offset</th>
+                                        <th style="min-width: 100px;">Scaled Minimum</th>
+                                        <th style="min-width: 100px;">Scaled Maximum</th>
+                                        <th style="min-width: 100px;">UM</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="jt in jdtesterhw">
+                                        <!--<td><input type="text" class="form-control" placeholder="Plant Station Id" ng-model="jt.plantStationId"></td>-->
+                                        <td><input type="text" class="form-control" placeholder="Name" ng-model="jt.name"></td>
+                                        <td><input type="text" class="form-control" placeholder="Description" ng-model="jt.description"></td>
+                                        <td><input type="text" class="form-control" placeholder="TLA" ng-model="jt.tla"></td>
+                                        <td><input type="text" class="form-control" placeholder="Felx Box Pin" ng-model="jt.felxBoxPin"></td>
+                                        <td><input type="text" class="form-control" placeholder="Type Code" ng-model="jt.typeCode"></td>
+                                        <td><input type="text" class="form-control" placeholder="Bulk Head Pin" ng-model="jt.bulkHeadPin"></td>
+                                        <td><input type="text" class="form-control" placeholder="Pull Up" ng-model="jt.pullUp"></td>
+                                        <td><input type="text" class="form-control" placeholder="PWM" ng-model="jt.pwm"></td>
+                                        <td><input type="text" class="form-control" placeholder="Connector" ng-model="jt.connector"></td>
+                                        <td><input type="text" class="form-control" placeholder="Fuses Relays" ng-model="jt.fusesRelays"></td>
+                                        <td><input type="text" class="form-control" placeholder="Block Offset" ng-model="jt.blockOffset"></td>
+                                        <td><input type="text" class="form-control" placeholder="Bit Offset" ng-model="jt.bitOffset"></td>
+                                        <td><input type="text" class="form-control" placeholder="Raw Minimum" ng-model="jt.rawMinimum"></td>
+                                        <td><input type="text" class="form-control" placeholder="Raw Maximum" ng-model="jt.rawMaximum"></td>
+                                        <td><input type="text" class="form-control" placeholder="Scaling Factor" ng-model="jt.scalingFactor"></td>
+                                        <td><input type="text" class="form-control" placeholder="Scaling Offset" ng-model="jt.scalingOffset"></td>
+                                        <td><input type="text" class="form-control" placeholder="Scaled Minimum" ng-model="jt.scaledMinimum"></td>
+                                        <td><input type="text" class="form-control" placeholder="Scaled Maximum" ng-model="jt.scaledMaximum"></td>
+                                        <td><input type="text" class="form-control" placeholder="UM" ng-model="jt.um"></td>
+                                        <td><button class="btn btn-danger" ng-click="deleteRow('JDTester HW', jt)" value="Remove">
+                                                <span class="glyphicon glyphicon-trash"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="modal-footer">
+                    <div class="col-md-7">
+                        <button class="btn btn-primary" ng-if="selectBox === 'Plant Station Details'" ng-click="savePlantStationDetails(plantstation)" data-dismiss="modal">Save</button>
+
+                        <button class="btn btn-primary" ng-if="selectBox === 'Can Hardware'" ng-click="addNewRow('Can Hardware')">Add Row</button>
+                        <button class="btn btn-primary" ng-if="selectBox === 'Can Hardware'" ng-disabled="!plantstation.id" ng-click="saveCanHardware(canhardware, plantstation.id)" data-dismiss="modal">Save</button>
+
+                        <button class="btn btn-primary" ng-if="selectBox === 'Config Setting'" ng-click="addNewRow('Config Setting')">Add Row</button>
+                        <button class="btn btn-primary" ng-if="selectBox === 'Config Setting'" ng-disabled="!plantstation.id" ng-click="saveConfigSetting(configsetting, plantstation.id)" data-dismiss="modal">Save</button>
+
+                        <button class="btn btn-primary" ng-if="selectBox === 'JDTester HW'" ng-click="addNewRow('JDTester HW')">Add Row</button>
+                        <button class="btn btn-primary" ng-if="selectBox === 'JDTester HW'" ng-disabled="!plantstation.id" ng-click="saveJdTesterHardware(jdtesterhw, plantstation.id)" data-dismiss="modal">Save</button>
+
+                        <button class="btn btn-primary" ng-click="saveAll()">Save All</button>
+                        <button class="btn btn-default" ng-click="clearForms()">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+            
+        
+    
+
+    <footer class="fixed-bottom">
+        <div class="col-md-4 leftalign">Home | Feedback | Help | FAQs</div>
+        <div class="col-md-4">Copyright &copy; 2018 Deere &amp; Company. All Rights Reserved.</div>
+        <div class="col-md-4 rightalign">Privacy & Data | Legal</div>
+    </footer>
+
+    <script src="components/angular-1.7.2/angular.js" type="text/javascript"> </script>
+    <script src="components/jquery/jquery-2.1.1.min.js"></script>
+    <script src="components/jquery-ui/jquery-ui.min.js"></script>
+    <script src="components/bootstrap/js/bootstrap.min.js"></script>
+    <script src="components/angular-ui-bootstrap/ui-bootstrap-tpls.min.js"></script>
+
+    <script src="scripts/app.js" type="text/javascript"></script>
+    <script src="scripts/controllers/AppController.js" type="text/javascript"></script>
+    <script src="scripts/factories/AppFactory.js" type="text/javascript"></script>
+    <script src="scripts/services/Constants.js" type="text/javascript"></script>
+    <script src="scripts/services/AppService.js" type="text/javascript"></script>
+
+</body>
+
+</html>

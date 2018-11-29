@@ -1,0 +1,211 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.chinmay.it.mfg</groupId>
+	<artifactId>smart-config-web-api</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
+	<name>smart-config-web-api</name>
+	<description>Smart Config Web Api</description>
+	
+	<distributionManagement>
+    <snapshotRepository>
+      <id>artifactory-project-snapshot</id>
+      <name>Artifactory Snapshot Repository</name>
+      <url>https://repository.deere.com/artifactory/it-manufacturing-snapshot-local</url>
+    </snapshotRepository>
+    <repository>
+      <id>artifactory-project-release</id>
+      <name>Artifactory Release Repository</name>
+      <url>https://repository.deere.com/artifactory/it-manufacturing-release-local</url>
+    </repository>
+  </distributionManagement>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+		<sonar.jdbc.url>
+			jdbc:mysql://localhost:3306/sonar?useUnicode=true&amp;characterEncoding=utf8
+		</sonar.jdbc.url>
+		<sonar.jdbc.driver>com.mysql.jdbc.Driver</sonar.jdbc.driver>
+		<sonar.jdbc.username>root</sonar.jdbc.username>
+		<sonar.jdbc.password>root</sonar.jdbc.password>
+		<sonar.login>${env.SONAR_USR}</sonar.login>
+		<sonar.password>${env.SONAR_PWD}</sonar.password>
+		<sonar.host.url>http://sonar.smart-test.ic.deere.com</sonar.host.url>
+		<sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
+		<sonar.java.codeCoveragePlugin>jacoco</sonar.java.codeCoveragePlugin>
+		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+		<sonar.forceAnalysis>true</sonar.forceAnalysis>
+		<sonar.jacoco.reportPath>${basedir}/target/jacoco.exec</sonar.jacoco.reportPath>
+		<sonar.pitest.mode>reuseReport</sonar.pitest.mode>
+		<sonar.pitest.reportsDirectory>target/pit-reports</sonar.pitest.reportsDirectory>
+	</properties>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.10.RELEASE</version>
+		<relativePath/>
+	</parent>
+
+	<dependencies>
+		<dependency>
+		   <groupId>org.springframework.boot</groupId>
+		   <artifactId>spring-boot-starter-tomcat</artifactId>
+		   <scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-activemq</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>mysql</groupId>
+		    <artifactId>mysql-connector-java</artifactId>
+		    <version>5.1.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.195</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<!-- <dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>sqljdbc4</artifactId>
+			<version>4.0</version>
+		</dependency>
+		<dependency>
+            <groupId>com.github.ulisesbocchio</groupId>
+            <artifactId>jasypt-spring-boot-starter</artifactId>
+            <version>2.0.0</version>
+        </dependency> -->
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.9</version>
+				<executions>
+					<execution>
+						<id>default-prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>default-report</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.pitest</groupId>
+				<artifactId>pitest-maven</artifactId>
+				<version>1.1.3</version>
+				<configuration>
+					<timestampedReports>false</timestampedReports>
+					<failWhenNoMutations>false</failWhenNoMutations>
+					<outputFormats>
+						<param>XML</param>
+						<param>HTML</param>
+						<param>CSV</param>
+					</outputFormats>
+					<targetClasses>
+						<param>com.deere.it.mfg.*</param>
+					</targetClasses>
+					<targetTests>
+						<param>com.deere.it.mfg.*</param>
+					</targetTests>
+					<excludedClasses>
+						<excludedClass>integration.*IT</excludedClass>
+						<excludedClass>com.deere.it.mfg.beanBuilders.*</excludedClass>
+					</excludedClasses>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.2</version>
+			</plugin>
+
+		</plugins>
+		
+	</build>
+	<!--<profiles>
+        <profile>
+            <id>deployit</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.xebialabs.xldeploy</groupId>
+                        <artifactId>xldeploy-maven-plugin</artifactId>
+                        <version>5.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>do-deploy</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>deploy</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <applicationName>G90_MFG_SMART_TEST_ADMIN/smartest</applicationName>
+                            <mainArtifactName>smartest</mainArtifactName>
+                            <environmentId>Environments/G90_MFG_SMART_TEST_ADMIN/${environment}</environmentId>
+
+                            <server>deployit-credentials</server>
+                            <serverAddress>deployit.deere.com</serverAddress>
+                            <port>443</port>
+                            <secured>true</secured>
+
+                            <deployables>
+                                <deployable>
+                                    <type>jee.War</type>
+                                    <name>config</name>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <tags>
+                                        <tag>smartest</tag>
+                                    </tags>
+                                </deployable>
+                            </deployables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>-->
+</project>
+
