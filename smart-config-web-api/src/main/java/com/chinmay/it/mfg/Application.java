@@ -57,6 +57,7 @@ public class Application extends SpringBootServletInitializer {
 		return dataSource;
 	}
 	/*--------Jasypt Password Encryption End--------*/
+	/*--------Jasypt Password Encryption CLOSE--------*/
 	
 
 
